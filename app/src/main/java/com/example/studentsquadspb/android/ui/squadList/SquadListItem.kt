@@ -1,17 +1,12 @@
-package com.example.studentsquadspb
+package com.example.studentsquadspb.android.ui.squadList
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -27,30 +22,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.studentsquadspb.android.data.directionLogo
+import com.example.studentsquadspb.android.data.model.SquadInfo
+import com.example.studentsquadspb.android.ui.theme.directionColor
 
 
-
-@DrawableRes
-fun directionLogo(direction: String): Int {
-    return when(direction){
-        "ССО" -> R.drawable.ic_logo_sso
-        "СПО" -> R.drawable.ic_logo_spo
-        "ССхО" -> R.drawable.ic_logo_ssho
-        "ССервО" -> R.drawable.ic_logo_sservo
-        "САО" -> R.drawable.ic_logo_sao
-        "СОП" -> R.drawable.ic_logo_sop
-        else -> R.drawable.ic_logo_sso
-    }
-}
 @Composable
 fun SquadListItem(squad: SquadInfo, onClick: () -> Unit, modifier: Modifier = Modifier) {
 
-
-
-    val cardColor = when (squad.direction_work){
-        "СОП" -> Color(0xFF2F5C8A)
-        else -> Color(0xFF3D6B3F)
-    }
+    val cardColor = directionColor(squad.directionWork)
 
     Card(
         onClick = onClick,
@@ -77,7 +57,7 @@ fun SquadListItem(squad: SquadInfo, onClick: () -> Unit, modifier: Modifier = Mo
             Column{
                 Row {
                     Text(
-                        text = squad.direction_work,
+                        text = squad.directionWork,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(2.dp)
@@ -91,7 +71,7 @@ fun SquadListItem(squad: SquadInfo, onClick: () -> Unit, modifier: Modifier = Mo
                     )}
 
                 Image(
-                    painter = painterResource(directionLogo(squad.direction_work)),
+                    painter = painterResource(directionLogo(squad.directionWork)),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(start = 6.dp)

@@ -1,4 +1,4 @@
-package com.example.studentsquadspb
+package com.example.studentsquadspb.android.ui.squadList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,13 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import com.example.studentsquadspb.R
+import com.example.studentsquadspb.android.data.FakeSquadRepository
+import com.example.studentsquadspb.android.data.model.SquadInfo
 
 
 // ---------- Экран: тулбар + список ----------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SquadListScreen(
+    squads: List<SquadInfo>,
     onAppClick: (SquadInfo) -> Unit
 ) {
     Scaffold(
@@ -54,7 +57,11 @@ fun SquadListScreen(
 }
 
 @Composable
-fun SquadList(squads: List<SquadInfo>, onAppClick: (SquadInfo) -> Unit, modifier: Modifier = Modifier) {
+fun SquadList(
+    squads: List<SquadInfo>,
+    onAppClick: (SquadInfo) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(12.dp),
@@ -67,7 +74,10 @@ fun SquadList(squads: List<SquadInfo>, onAppClick: (SquadInfo) -> Unit, modifier
 @Preview(showBackground = true)
 @Composable
 fun SquadListScreenPreview() {
-    AppListTheme {
-        SquadListScreen(onAppClick = {})
+    _root_ide_package_.com.example.studentsquadspb.android.AppListTheme {
+        SquadListScreen(
+            squads = FakeSquadRepository.getSquads(),
+            onAppClick = {}
+        )
     }
 }
