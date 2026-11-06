@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.android.data.directionLogo
-import com.example.studentsquadspb.android.data.model.SquadInfo
+import com.example.studentsquadspb.android.data.model.info.SquadInfo
 import com.example.studentsquadspb.android.ui.theme.directionColor
 
 

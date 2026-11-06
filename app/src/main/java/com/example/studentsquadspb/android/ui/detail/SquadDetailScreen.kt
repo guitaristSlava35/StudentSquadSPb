@@ -1,10 +1,8 @@
 package com.example.studentsquadspb.android.ui.detail
 
-import android.view.SurfaceControl
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -20,11 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
 
 import androidx.compose.material3.IconButton
@@ -36,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.android.data.FakeSquadRepository
 import com.example.studentsquadspb.android.data.directionLogo
 import com.example.studentsquadspb.android.data.headquartersLogo
-import com.example.studentsquadspb.android.data.model.SquadInfo
+import com.example.studentsquadspb.android.data.model.info.SquadInfo
 import com.example.studentsquadspb.android.data.model.SquadMember
 import com.example.studentsquadspb.android.data.model.SquadMemberType
 import com.example.studentsquadspb.android.ui.theme.AppListTheme
@@ -63,7 +56,8 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 fun SquadDetailScreen(
     squad: SquadInfo,
     members: List<SquadMember>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onMemberClick: (SquadMember) -> Unit
 ){
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = SquadMemberType.entries
@@ -77,14 +71,16 @@ fun SquadDetailScreen(
     ) {
         LazyColumn(
             modifier = Modifier.statusBarsPadding(),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
                 IconButton(
                     onClick = onBack,
                     modifier = Modifier
+                        .padding(horizontal = 8.dp)
                         .clip(CircleShape)
                         .background(Color.White.copy(alpha = 0.15f))
+
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -97,19 +93,23 @@ fun SquadDetailScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
+                        .padding(top = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
                         painter = painterResource(squad.emblem),
                         contentDescription = squad.name,
                         modifier = Modifier
+                            .padding(start = 8.dp)
                             .size(124.dp)
                             .clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Spacer(Modifier.width(16.dp))
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)){
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.padding(end = 16.dp)
+                    ){
                         InfoField("Название", squad.name)
                         InfoField("Дата основания", squad.dateBirthday.ifBlank { "—" })
                     }
@@ -120,12 +120,14 @@ fun SquadDetailScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp),
+                        .padding(vertical = 16.dp, horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
                         Text("Направление", style = MaterialTheme.typography.labelSmall)
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(6.dp))
                         Image(
                             painter = painterResource(directionLogo(squad.directionWork)),
                             contentDescription = squad.directionWork,
@@ -135,7 +137,7 @@ fun SquadDetailScreen(
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("Штаб", style = MaterialTheme.typography.labelSmall)
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(6.dp))
                         Image(
                             painter = painterResource(headquartersLogo(squad.headquarters)),
                             contentDescription = squad.headquarters,
@@ -179,13 +181,13 @@ fun SquadDetailScreen(
                 item {
                     Text(
                         text = "Пока никого нет",
-                        modifier = Modifier.padding(vertical = 24.dp)
+                        modifier = Modifier.padding(vertical = 24.dp, horizontal = 8.dp)
                     )
                 }
             }
             else {
                 items(shownMembers, key = { it.memberId }) {
-                    member -> SquadItem(member)
+                    member -> SquadItem(member, onClick = { onMemberClick(member) })
                 }
             }
         }
@@ -201,7 +203,8 @@ fun SquadDetailsScreenPreview() {
         SquadDetailScreen(
             squad = squad,
             members = FakeSquadRepository.getMembers(squad.id),
-            onBack = {}
+            onBack = {},
+            onMemberClick = {}
         )
     }
 }
@@ -215,7 +218,8 @@ fun SquadDetailsScreenEmptyPreview() {
         SquadDetailScreen(
             squad = squad,
             members = emptyList(),
-            onBack = {}
+            onBack = {},
+            onMemberClick = {}
         )
     }
 }
@@ -229,7 +233,8 @@ fun SquadDetailsScreenSOPPreview() {
         SquadDetailScreen(
             squad = squad,
             members = FakeSquadRepository.getMembers(squad.id),
-            onBack = {}
+            onBack = {},
+            onMemberClick = {}
         )
     }
 }

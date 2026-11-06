@@ -1,7 +1,6 @@
-package com.example.studentsquadspb.android.data.model
+package com.example.studentsquadspb.android.data.model.info
 
 import androidx.annotation.DrawableRes
-import com.example.studentsquadspb.R
 
 data class SquadInfo(
     val id: Int,

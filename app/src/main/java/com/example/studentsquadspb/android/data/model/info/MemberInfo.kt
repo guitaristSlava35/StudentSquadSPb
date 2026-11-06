@@ -1,4 +1,4 @@
-package com.example.studentsquadspb.android.data.model
+package com.example.studentsquadspb.android.data.model.info
 
 import androidx.annotation.DrawableRes
 
@@ -9,5 +9,5 @@ data class MemberInfo(
     val surname: String,
     val patronymic: String ?= null,
     val dateBirthday: String,
-)
+    )
 
