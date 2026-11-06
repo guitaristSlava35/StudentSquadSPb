@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.R
 import com.example.studentsquadspb.android.data.FakeSquadRepository
-import com.example.studentsquadspb.android.data.model.SquadInfo
+import com.example.studentsquadspb.android.data.model.info.SquadInfo
 
 
 // ---------- Экран: тулбар + список ----------

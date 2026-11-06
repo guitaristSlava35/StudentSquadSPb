@@ -1,11 +1,9 @@
 package com.example.studentsquadspb.android.ui.detail
 
-import android.R
-import android.R.attr.text
-import android.widget.Toolbar
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,31 +13,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import com.example.studentsquadspb.android.data.model.MemberInfo
-import com.example.studentsquadspb.android.data.model.MemberSquad
-import com.example.studentsquadspb.android.data.model.SquadInfo
 import com.example.studentsquadspb.android.data.model.SquadMember
+import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
 
 private val AvatarSize = 48.dp
 
@@ -92,14 +81,14 @@ fun MemberAvatar (
 @Composable
 fun InfoField(
     label: String,
-    value: String,
+    value: String?,
     modifier: Modifier = Modifier
 ){
     Column(
         modifier = modifier
     ){
         Text(label, style = MaterialTheme.typography.labelSmall)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
+        Text(value ?: "-", style = MaterialTheme.typography.bodyLarge)
         HorizontalDivider(
             modifier = Modifier
                 .padding(top = 4.dp),
@@ -111,14 +100,14 @@ fun InfoField(
 @Composable
 fun SquadItem(
     member: SquadMember,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ){
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         MemberAvatar(fullname = member.fullName, photo = member.photo)
@@ -129,9 +118,9 @@ fun SquadItem(
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
             )
-            if(member.positions.isNotEmpty()) {
+            if(member.positionsSquad.isNotEmpty()) {
                 Text(
-                    text = member.positions.joinToString(", ") {it.title},
+                    text = member.positionsSquad.joinToString(", ") {it.title},
                     style = MaterialTheme.typography.bodySmall
                 )
             }
