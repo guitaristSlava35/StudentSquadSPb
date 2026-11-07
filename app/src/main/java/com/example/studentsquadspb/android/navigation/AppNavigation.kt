@@ -1,28 +1,30 @@
     package com.example.studentsquadspb.android.navigation
 
-    import android.adservices.adid.AdId
     import androidx.compose.foundation.layout.WindowInsets
     import androidx.compose.foundation.layout.padding
     import androidx.compose.material3.Scaffold
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
+    import androidx.compose.runtime.collectAsState
     import androidx.compose.runtime.getValue
     import androidx.compose.ui.Modifier
+    import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
     import androidx.navigation.NavType
     import androidx.navigation.compose.NavHost
     import androidx.navigation.compose.composable
     import androidx.navigation.compose.currentBackStackEntryAsState
     import androidx.navigation.compose.rememberNavController
     import androidx.navigation.navArgument
-    import com.example.studentsquadspb.android.data.FakeSquadRepository
     import com.example.studentsquadspb.android.data.SquadRepository
+    import com.example.studentsquadspb.android.data.model.MemberViewModel
     import com.example.studentsquadspb.android.data.model.bottomtab.AppBottomBar
     import com.example.studentsquadspb.android.data.model.bottomtab.BottomTab
     import com.example.studentsquadspb.android.ui.StubScreen
     import com.example.studentsquadspb.android.ui.detail.SquadDetailScreen
     import com.example.studentsquadspb.android.ui.member.MemberScreen
     import com.example.studentsquadspb.android.ui.squadList.SquadListScreen
-    import com.example.studentsquadspb.android.ui.member.MemberScreen
+
+
 
     object Routes {
         const val LIST = "list"
@@ -43,7 +45,7 @@
 
     @Composable
     fun AppNavigation(
-        repository: SquadRepository = FakeSquadRepository
+        repository: SquadRepository
     ) {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -105,27 +107,22 @@
                         navArgument(Routes.ARG_SQUAD_ID) { type = NavType.IntType },
                         navArgument(Routes.ARG_MEMBER_ID) { type = NavType.IntType }
                     )
-                ) { backStackEntry ->
-                    val squadId = backStackEntry.arguments?.getInt(Routes.ARG_SQUAD_ID)
-                    val memberId = backStackEntry.arguments?.getInt(Routes.ARG_MEMBER_ID)
+                ) {
+                    val viewModel: MemberViewModel = hiltViewModel()
+                    val state by viewModel.uiState.collectAsState()
 
-                    val squad = squadId?.let { repository.getSquad(it) }
-                    val member = memberId?.let { repository.getMember(it) }
-
-                    if (squad != null && member != null) {
+                    state?.let { ui ->
                         MemberScreen(
-                            squad = squad,
-                            member = member,
-                            membersquad = repository.getMemberSquads(member.id),
+                            state = ui,
                             onBack = { navController.popBackStack() },
                             onSquadClick = { target ->
-                                if (target.id == squad.id) navController.popBackStack()
-                                else navController.navigate(Routes.detail(target.id))
+                                if (target.id == ui.squad.id) navController.popBackStack()
+                                else navController.navigate(Routes.detail(target.id)){
+                                    launchSingleTop = true
+                                }
                             }
                         )
-                    } else {
-                        LaunchedEffect(Unit) { navController.popBackStack() }
-                    }
+                    } ?: LaunchedEffect(Unit) { navController.popBackStack() }
                 }
 
                 composable(Routes.HEADQUARTERS) { StubScreen("Штабы") }

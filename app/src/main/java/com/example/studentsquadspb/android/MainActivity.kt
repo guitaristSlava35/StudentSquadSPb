@@ -7,8 +7,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.example.studentsquadspb.android.data.SquadRepository
 import com.example.studentsquadspb.android.navigation.AppNavigation
 import com.example.studentsquadspb.android.ui.squadList.SquadListScreen
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 private val GreenColors = lightColorScheme(
     primary = Color(0xFF3D6B3F),
@@ -23,12 +26,16 @@ private val GreenColors = lightColorScheme(
 fun AppListTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = GreenColors, content = content)
 }
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var repository: SquadRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppListTheme {
-                AppNavigation()
+                AppNavigation(repository)
             }
         }
     }

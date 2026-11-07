@@ -14,6 +14,8 @@ import com.example.studentsquadspb.android.data.model.position.ExPosition
 import com.example.studentsquadspb.android.data.model.position.ExPositionCategory
 import com.example.studentsquadspb.android.data.model.position.MemberExPosition
 import com.example.studentsquadspb.android.data.model.position.ProfileExPosition
+import javax.inject.Inject
+import javax.inject.Singleton
 
 interface SquadRepository{
     fun getSquads(): List<SquadInfo>
@@ -30,7 +32,8 @@ interface SquadRepository{
 
 }
 
-object FakeSquadRepository : SquadRepository{
+@Singleton
+class SquadRepositoryImpl @Inject constructor() : SquadRepository {
 
     private val positions = listOf(
         Position(1, "Командир", PositionCategory.COMMAND_SQUAD),
@@ -187,8 +190,6 @@ fun directionLogo(direction: String): Int {
         else -> R.drawable.ic_logo_sso
     }
 }
-
-@DrawableRes
 fun headquartersLogo(headquarters: String): Int{
     return when(headquarters){
         "СПбПУ" -> R.drawable.ic_spbpu

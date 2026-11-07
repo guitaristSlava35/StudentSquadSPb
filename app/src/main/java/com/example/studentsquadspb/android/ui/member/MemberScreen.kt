@@ -41,19 +41,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.R
 import com.example.studentsquadspb.android.AppListTheme
-import com.example.studentsquadspb.android.data.FakeSquadRepository
+import com.example.studentsquadspb.android.data.SquadRepositoryImpl
 import com.example.studentsquadspb.android.data.directionLogo
 import com.example.studentsquadspb.android.data.exPositionLogo
 import com.example.studentsquadspb.android.data.headquartersLogo
 import com.example.studentsquadspb.android.data.model.info.MemberInfo
 import com.example.studentsquadspb.android.data.model.MemberSquad
-import com.example.studentsquadspb.android.data.model.SquadMember
+import com.example.studentsquadspb.android.data.model.MemberUiState
 import com.example.studentsquadspb.android.data.model.position.PositionCategory
 import com.example.studentsquadspb.android.data.model.position.Position
 import com.example.studentsquadspb.android.data.model.info.SquadInfo
 import com.example.studentsquadspb.android.data.model.position.ExPositionCategory
 import com.example.studentsquadspb.android.data.model.position.ProfileExPosition
 import com.example.studentsquadspb.android.data.positionLogo
+import com.example.studentsquadspb.android.navigation.Routes.member
 import com.example.studentsquadspb.android.ui.detail.InfoField
 import com.example.studentsquadspb.android.ui.theme.directionColor
 
@@ -173,29 +174,25 @@ fun MemberPhoto (
 
 @Composable
 fun MemberScreen(
-    squad: SquadInfo,
-    member: MemberInfo,
-    membersquad: List<MemberSquad>,
+    state: MemberUiState,
     onBack: () -> Unit,
     onSquadClick: (SquadInfo) -> Unit,
     modifier: Modifier = Modifier
 ){
-    val squads = FakeSquadRepository.getFighterSquads(member.id)
-    val headquarters = FakeSquadRepository.getProfileHadquarters(member.id)
-    val directions = FakeSquadRepository.getProfileDirectionWork(member.id)
-    val positions = FakeSquadRepository.getProfileRoleSquad(member.id)
-    val seasons = FakeSquadRepository.getMemberSeasons(member.id)
-    val exPositions = FakeSquadRepository.getProfileExRoleSquad(member.id)
+    val squad = state.squad
+    val member = state.member
+    val squads = state.squads
+    val headquarters = state.headquarters
+    val directions = state.directions
+    val seasons = state.seasons
 
-    val exGrouped = exPositions.groupBy { it.exPosition.exCategory }
-    val grouped = positions.groupBy {it.category}
-    val isFighter = membersquad.any { it.type.isFighter }
+    val grouped = state.positions.groupBy { it.category }
+    val exGrouped = state.exPositions.groupBy { it.exPosition.exCategory }
+    val isFighter = state.memberSquads.any { it.type.isFighter }
 
     val commandPositions = grouped[PositionCategory.COMMAND_SQUAD].orEmpty()
     val flagPositions = grouped[PositionCategory.FLAG].orEmpty()
     val otherPositions = grouped[PositionCategory.OTHER].orEmpty()
-    val exCommand = exGrouped[ExPositionCategory.EX_COMMAND_SQUAD].orEmpty()
-
 
 
     Surface(
@@ -374,17 +371,23 @@ fun MemberScreen(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MemberScreenPriview(){
-    val member = FakeSquadRepository.getMembers(1).first()
+fun MemberScreenPreview() {
+    val repo = SquadRepositoryImpl()
+    val id = 6
+
+    val state = MemberUiState(
+        squad = repo.getSquad(1)!!,
+        member = repo.getMember(id)!!,
+        memberSquads = repo.getMemberSquads(id),
+        squads = repo.getFighterSquads(id),
+        headquarters = repo.getProfileHadquarters(id),
+        directions = repo.getProfileDirectionWork(id),
+        positions = repo.getProfileRoleSquad(id),
+        exPositions = repo.getProfileExRoleSquad(id),
+        seasons = repo.getMemberSeasons(id)
+    )
 
     AppListTheme {
-        MemberScreen(
-            squad = FakeSquadRepository.getSquad(1)!!,
-            member = FakeSquadRepository.getMember(6)!!,
-            membersquad = FakeSquadRepository.getMemberSquads(1),
-            onBack = {},
-            onSquadClick = {}
-        )
+        MemberScreen(state = state, onBack = {}, onSquadClick = {})
     }
-
 }

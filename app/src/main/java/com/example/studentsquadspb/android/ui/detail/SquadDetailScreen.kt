@@ -41,7 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.studentsquadspb.android.data.FakeSquadRepository
+import com.example.studentsquadspb.android.data.SquadRepositoryImpl
 import com.example.studentsquadspb.android.data.directionLogo
 import com.example.studentsquadspb.android.data.headquartersLogo
 import com.example.studentsquadspb.android.data.model.info.SquadInfo
@@ -197,12 +197,14 @@ fun SquadDetailScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SquadDetailsScreenPreview() {
-    val squad = FakeSquadRepository.getSquads().first()
+    val repo = SquadRepositoryImpl()
+    val squad = repo.getSquads().first()
+
 
     AppListTheme {
         SquadDetailScreen(
             squad = squad,
-            members = FakeSquadRepository.getMembers(squad.id),
+            members = repo.getMembers(squad.id),
             onBack = {},
             onMemberClick = {}
         )
@@ -212,7 +214,8 @@ fun SquadDetailsScreenPreview() {
 @Preview(name = "Без Участников", showBackground = true, showSystemUi = true)
 @Composable
 fun SquadDetailsScreenEmptyPreview() {
-    val squad = FakeSquadRepository.getSquads().first()
+    val repo = SquadRepositoryImpl()
+    val squad = repo.getSquads().first()
 
     AppListTheme {
         SquadDetailScreen(
@@ -227,12 +230,13 @@ fun SquadDetailsScreenEmptyPreview() {
 @Preview(name = "Проводники", showBackground = true, showSystemUi = true)
 @Composable
 fun SquadDetailsScreenSOPPreview() {
-    val squad = FakeSquadRepository.getSquads().first { it.name == "Проворный" }
+    val repo = SquadRepositoryImpl()
+    val squad = repo.getSquads().first { it.name == "Проворный" }
 
     AppListTheme {
         SquadDetailScreen(
             squad = squad,
-            members = FakeSquadRepository.getMembers(squad.id),
+            members = repo.getMembers(squad.id),
             onBack = {},
             onMemberClick = {}
         )

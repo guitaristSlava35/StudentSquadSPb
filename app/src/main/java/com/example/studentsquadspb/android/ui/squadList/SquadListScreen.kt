@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.R
-import com.example.studentsquadspb.android.data.FakeSquadRepository
+import com.example.studentsquadspb.android.data.SquadRepositoryImpl
 import com.example.studentsquadspb.android.data.model.info.SquadInfo
 
 
@@ -75,8 +75,11 @@ fun SquadList(
 @Composable
 fun SquadListScreenPreview() {
     _root_ide_package_.com.example.studentsquadspb.android.AppListTheme {
+        val repo = SquadRepositoryImpl()
+        repo.getSquads()
+
         SquadListScreen(
-            squads = FakeSquadRepository.getSquads(),
+            squads = repo.getSquads(),
             onAppClick = {}
         )
     }
