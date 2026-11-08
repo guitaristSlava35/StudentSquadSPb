@@ -57,7 +57,9 @@ fun SquadDetailScreen(
     squad: SquadInfo,
     members: List<SquadMember>,
     onBack: () -> Unit,
-    onMemberClick: (SquadMember) -> Unit
+    onMemberClick: (SquadMember) -> Unit,
+    joinState: JoinState = JoinState.NotSent,
+    onJoinClick: () -> Unit = {},
 ){
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = SquadMemberType.entries
@@ -74,18 +76,27 @@ fun SquadDetailScreen(
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
             item {
-                IconButton(
-                    onClick = onBack,
+                Row(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.15f))
-
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Назад"
-                    )
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.15f))
+
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
+
+                    JoinButton(joinState, onJoinClick, Modifier.padding(vertical = 8.dp))
+
                 }
             }
 

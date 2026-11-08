@@ -1,13 +1,18 @@
 package com.example.studentsquadspb.android.ui.squadList
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.studentsquadspb.R
 import com.example.studentsquadspb.android.data.SquadRepositoryImpl
+import com.example.studentsquadspb.android.data.model.info.RatingsState
 import com.example.studentsquadspb.android.data.model.info.SquadInfo
 
 
@@ -29,7 +35,10 @@ import com.example.studentsquadspb.android.data.model.info.SquadInfo
 @Composable
 fun SquadListScreen(
     squads: List<SquadInfo>,
-    onAppClick: (SquadInfo) -> Unit
+    onAppClick: (SquadInfo) -> Unit,
+    ratings: RatingsState = RatingsState(),
+    onLoadSequential: () -> Unit = {},
+    onLoadParallel: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -52,7 +61,14 @@ fun SquadListScreen(
             )
         },
     ) { padding ->
-        SquadList(squads = squads, onAppClick = onAppClick, modifier = Modifier.padding(padding))
+        SquadList(
+            squads = squads,
+            onAppClick = onAppClick,
+            ratings = ratings,
+            onLoadSequential = onLoadSequential,
+            onLoadParallel = onLoadParallel,
+            modifier = Modifier.padding(padding)
+        )
     }
 }
 
@@ -60,6 +76,9 @@ fun SquadListScreen(
 fun SquadList(
     squads: List<SquadInfo>,
     onAppClick: (SquadInfo) -> Unit,
+    ratings: RatingsState = RatingsState(),
+    onLoadSequential: () -> Unit = {},
+    onLoadParallel: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -67,8 +86,26 @@ fun SquadList(
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(squads) { squad -> SquadListItem(squad = squad, onClick = {onAppClick(squad)}) }
-    }
+        item {                                   // ← шапка с кнопками
+            Column {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = onLoadSequential, enabled = !ratings.loading) { Text("По очереди") }
+                    Button(onClick = onLoadParallel, enabled = !ratings.loading) { Text("Параллельно") }
+                }
+                if (ratings.loading) {
+                    LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 8.dp))
+                }
+                ratings.lastRun?.let { Text(it, Modifier.padding(top = 8.dp)) }
+            }
+        }
+        items(squads) { squad ->
+            SquadListItem(
+                squad = squad,
+                rating = ratings.ratings[squad.id],
+                loading = ratings.loading,
+                onClick = { onAppClick(squad) }
+            )
+        }    }
 }
 
 @Preview(showBackground = true)

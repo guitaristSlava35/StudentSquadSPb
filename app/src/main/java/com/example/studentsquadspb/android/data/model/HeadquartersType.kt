@@ -1,6 +1,6 @@
 package com.example.studentsquadspb.android.data.model
 
-enum class HadquartersType (val title: String) {
+enum class HeadquartersType (val title: String) {
     COMMAND("Командный состав"),
     SQUADS("Отряды")
 }

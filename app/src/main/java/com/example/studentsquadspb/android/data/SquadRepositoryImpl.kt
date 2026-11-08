@@ -10,6 +10,7 @@ import com.example.studentsquadspb.android.data.model.position.Position
 import com.example.studentsquadspb.android.data.model.info.SquadInfo
 import com.example.studentsquadspb.android.data.model.SquadMember
 import com.example.studentsquadspb.android.data.model.SquadMemberType
+import com.example.studentsquadspb.android.data.model.info.HeadquartersInfo
 import com.example.studentsquadspb.android.data.model.position.ExPosition
 import com.example.studentsquadspb.android.data.model.position.ExPositionCategory
 import com.example.studentsquadspb.android.data.model.position.MemberExPosition
@@ -29,6 +30,8 @@ interface SquadRepository{
     fun getProfileRoleSquad(memberId: Int): List<Position>
     fun getMemberSeasons(memberId: Int): List<Int>
     fun getProfileExRoleSquad(memberId: Int): List<ProfileExPosition>
+    fun getHeadquarters(): List<HeadquartersInfo>
+    //fun getHeadquarter(id: String): HadquartersInfo?
 
 }
 
@@ -112,6 +115,26 @@ class SquadRepositoryImpl @Inject constructor() : SquadRepository {
 
     )
 
+    private val headquarters = listOf(
+        HeadquartersInfo("SPbPU", R.drawable.ic_spbpu, "СПбПУ", "01.01.1999"),
+        HeadquartersInfo("LETI", R.drawable.ic_leti, "ЛЭТИ", "01.01.1999"),
+        HeadquartersInfo("SPbGASU", R.drawable.ic_spbgasu, "СПбГАСУ", "01.01.1999"),
+        HeadquartersInfo("SPbGUPTD", R.drawable.ic_spbguptd, "СПбГУПТД", "01.01.1999"),
+        HeadquartersInfo("GUAP", R.drawable.ic_guap, "ГУАП", "01.01.1999"),
+        HeadquartersInfo("SZGMU", R.drawable.ic_szgmu, "СЗГМУ", "01.01.1999"),
+        HeadquartersInfo("SPbGEU", R.drawable.ic_spbgeu, "СПбГЭУ", "01.01.1999"),
+        HeadquartersInfo("ITMO", R.drawable.ic_itmo, "ИТМО", "01.01.1999"),
+        HeadquartersInfo("RGPU", R.drawable.ic_rgpu, "РГПУ", "01.01.1999"),
+        HeadquartersInfo("PSPbGMU", R.drawable.ic_pspbgmu, "ПСПбГМУ", "01.01.1999"),
+        HeadquartersInfo("SPbGU", R.drawable.ic_spbgu, "СПбГУ", "01.01.1999"),
+        HeadquartersInfo("BGTU", R.drawable.ic_bgtu, "БГТУ Военмех", "01.01.1999"),
+        HeadquartersInfo("TU", R.drawable.ic_tu, "Технологический институт", "01.01.1999"),
+        HeadquartersInfo("SPbGMTU", R.drawable.ic_spbgmtu, "СПбГМТУ", "01.01.1999"),
+        HeadquartersInfo("SPbGUT", R.drawable.ic_spbgut, "СПбГУТ", "01.01.1999"),
+
+
+        )
+
     override fun getSquads() = squads
 
     override fun getSquad(id: Int) = squads.find {it.id == id}
@@ -125,7 +148,7 @@ class SquadRepositoryImpl @Inject constructor() : SquadRepository {
                     listOf(person.name, person.surname)
                     .filter { it.isNotBlank() }
                     .joinToString(" "),
-                    link.dateJoininig,
+                    link.dateJoinig,
                     link.type,
                     positions.filter { it.id in link.positionIds }
                 )
@@ -175,6 +198,8 @@ class SquadRepositoryImpl @Inject constructor() : SquadRepository {
                 ?.let { ProfileExPosition(link.yearSeason, it) }
         }
         .sortedBy { it.year }
+
+    override fun getHeadquarters() = headquarters
 
 }
 

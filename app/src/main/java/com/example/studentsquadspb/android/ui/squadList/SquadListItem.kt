@@ -28,7 +28,14 @@ import com.example.studentsquadspb.android.ui.theme.directionColor
 
 
 @Composable
-fun SquadListItem(squad: SquadInfo, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun SquadListItem(
+    squad: SquadInfo,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    rating: Float? = null,
+    loading: Boolean = false,
+
+) {
 
     val cardColor = directionColor(squad.directionWork)
 
@@ -68,7 +75,15 @@ fun SquadListItem(squad: SquadInfo, onClick: () -> Unit, modifier: Modifier = Mo
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(2.dp)
-                    )}
+                    )
+                    Text(
+                        when {
+                            rating != null -> "★ $rating"
+                            loading -> "★ …"
+                            else -> ""
+                        }
+                    )
+                }
 
                 Image(
                     painter = painterResource(directionLogo(squad.directionWork)),
