@@ -1,13 +1,25 @@
     package com.example.studentsquadspb.android.navigation
 
+    import androidx.compose.foundation.layout.Arrangement
+    import androidx.compose.foundation.layout.Box
+    import androidx.compose.foundation.layout.Column
+    import androidx.compose.foundation.layout.Spacer
     import androidx.compose.foundation.layout.WindowInsets
+    import androidx.compose.foundation.layout.fillMaxSize
+    import androidx.compose.foundation.layout.height
     import androidx.compose.foundation.layout.padding
+    import androidx.compose.material3.Button
+    import androidx.compose.material3.CircularProgressIndicator
     import androidx.compose.material3.Scaffold
+    import androidx.compose.material3.Text
+    import androidx.compose.material3.TextButton
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.LaunchedEffect
     import androidx.compose.runtime.collectAsState
     import androidx.compose.runtime.getValue
+    import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
+    import androidx.compose.ui.unit.dp
     import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
     import androidx.navigation.NavType
     import androidx.navigation.compose.NavHost
@@ -16,14 +28,18 @@
     import androidx.navigation.compose.rememberNavController
     import androidx.navigation.navArgument
     import com.example.studentsquadspb.android.data.SquadRepository
+    import com.example.studentsquadspb.android.data.model.MemberLoadState
     import com.example.studentsquadspb.android.data.model.MemberViewModel
     import com.example.studentsquadspb.android.data.model.bottomtab.AppBottomBar
     import com.example.studentsquadspb.android.data.model.bottomtab.BottomTab
     import com.example.studentsquadspb.android.ui.StubScreen
     import com.example.studentsquadspb.android.ui.detail.SquadDetailScreen
+    import com.example.studentsquadspb.android.ui.detail.SquadDetailState
+    import com.example.studentsquadspb.android.ui.detail.SquadDetailViewModel
     import com.example.studentsquadspb.android.ui.member.MemberScreen
     import com.example.studentsquadspb.android.ui.squadList.SquadListScreen
-
+    import com.example.studentsquadspb.android.ui.squadList.SquadListUiState
+    import com.example.studentsquadspb.android.ui.squadList.SquadListViewModel
 
 
     object Routes {
@@ -45,7 +61,6 @@
 
     @Composable
     fun AppNavigation(
-        repository: SquadRepository
     ) {
         val navController = rememberNavController()
         val backStackEntry by navController.currentBackStackEntryAsState()
@@ -67,36 +82,64 @@
 
                 // Экран 1: список отрядов
                 composable(Routes.LIST) {
-                    SquadListScreen(
-                        squads = repository.getSquads(),
-                        onAppClick = { squad ->
-                            navController.navigate(Routes.detail(squad.id))
+                    val viewModel: SquadListViewModel = hiltViewModel()
+                    val state by viewModel.state.collectAsState()
+
+                    when (val s = state) {
+                        is SquadListUiState.Loading -> Box(
+                            Modifier.fillMaxSize(),
+                            Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
-                    )
+
+                        is SquadListUiState.Error -> Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(s.message)
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = viewModel::load) { Text("Повторить") }
+                        }
+
+                        is SquadListUiState.Success -> SquadListScreen(
+                            squads = s.squads,
+                            onAppClick = { squad -> navController.navigate(Routes.detail(squad.id)) }
+                        )
+                    }
                 }
 
                 // Экран 2: профиль отряда
                 composable(
                     route = Routes.DETAIL_PATTERN,
-                    arguments = listOf(
-                        navArgument(Routes.ARG_SQUAD_ID) { type = NavType.IntType }
-                    )
-                ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getInt(Routes.ARG_SQUAD_ID)
-                    val squad = id?.let { repository.getSquad(it) }
+                    arguments = listOf(navArgument(Routes.ARG_SQUAD_ID) { type = NavType.IntType })
+                ) {
+                    val viewModel: SquadDetailViewModel = hiltViewModel()
+                    val state by viewModel.state.collectAsState()
 
-                    if (squad != null) {
-                        SquadDetailScreen(
-                            squad = squad,
-                            members = repository.getMembers(squad.id),
+                    when (val s = state) {
+                        is SquadDetailState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                        is SquadDetailState.Error -> Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(s.message)
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = viewModel::load) { Text("Повторить") }
+                            TextButton(onClick = { navController.popBackStack() }) { Text("Назад") }
+                        }
+                        is SquadDetailState.Success -> SquadDetailScreen(
+                            squad = s.detail.squad,
+                            members = s.detail.members,
                             onBack = { navController.popBackStack() },
                             onMemberClick = { member ->
-                                navController.navigate(Routes.member(squad.id, member.memberId))
+                                navController.navigate(Routes.member(s.detail.squad.id, member.memberId))
                             }
                         )
-                    } else {
-                        // Отряд не найден: возвращаемся к списку
-                        LaunchedEffect(Unit) { navController.popBackStack() }
                     }
                 }
 
@@ -109,20 +152,31 @@
                     )
                 ) {
                     val viewModel: MemberViewModel = hiltViewModel()
-                    val state by viewModel.uiState.collectAsState()
+                    val state by viewModel.state.collectAsState()
 
-                    state?.let { ui ->
-                        MemberScreen(
-                            state = ui,
+                    when (val s = state) {
+                        is MemberLoadState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                        is MemberLoadState.Error -> Column(
+                            Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(s.message)
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = viewModel::load) { Text("Повторить") }
+                            TextButton(onClick = { navController.popBackStack() }) { Text("Назад") }
+                        }
+                        is MemberLoadState.Success -> MemberScreen(
+                            state = s.ui,
                             onBack = { navController.popBackStack() },
                             onSquadClick = { target ->
-                                if (target.id == ui.squad.id) navController.popBackStack()
-                                else navController.navigate(Routes.detail(target.id)){
-                                    launchSingleTop = true
-                                }
+                                if (target.id == s.ui.squad.id) navController.popBackStack()
+                                else navController.navigate(Routes.detail(target.id)) { launchSingleTop = true }
                             }
                         )
-                    } ?: LaunchedEffect(Unit) { navController.popBackStack() }
+                    }
                 }
 
                 composable(Routes.HEADQUARTERS) { StubScreen("Штабы") }

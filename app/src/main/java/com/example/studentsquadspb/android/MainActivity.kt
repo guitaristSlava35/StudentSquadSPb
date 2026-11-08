@@ -29,15 +29,16 @@ fun AppListTheme(content: @Composable () -> Unit) {
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var repository: SquadRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             AppListTheme {
-                AppNavigation(repository)
+                AppNavigation()
             }
         }
     }
 }
+
+//json-server --watch db.json --host 0.0.0.0 --port 3000
+//& "C:\Users\gitar\AppData\Local\Android\Sdk\platform-tools\adb.exe" reverse tcp:3000 tcp:3000
 

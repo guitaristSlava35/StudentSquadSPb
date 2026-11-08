@@ -29,7 +29,6 @@ interface SquadRepository{
     fun getProfileRoleSquad(memberId: Int): List<Position>
     fun getMemberSeasons(memberId: Int): List<Int>
     fun getProfileExRoleSquad(memberId: Int): List<ProfileExPosition>
-
 }
 
 @Singleton
@@ -125,7 +124,7 @@ class SquadRepositoryImpl @Inject constructor() : SquadRepository {
                     listOf(person.name, person.surname)
                     .filter { it.isNotBlank() }
                     .joinToString(" "),
-                    link.dateJoininig,
+                    link.dateJoinig,
                     link.type,
                     positions.filter { it.id in link.positionIds }
                 )
